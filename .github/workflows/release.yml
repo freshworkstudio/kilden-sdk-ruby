@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   publish:
@@ -25,15 +26,12 @@ jobs:
         env:
           KILDEN_SPEC_DIR: ${{ github.workspace }}/kilden-sdk-spec
       - run: gem build kilden.gemspec
+      - name: configure rubygems credentials (OIDC trusted publishing)
+        # rubygems.org has this repo+workflow registered as the gem's
+        # trusted publisher — no API key secret to rotate.
+        uses: rubygems/configure-rubygems-credentials@v1
       - name: push to rubygems
-        env:
-          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
-        run: |
-          if [ -z "$GEM_HOST_API_KEY" ]; then
-            echo "RUBYGEMS_API_KEY secret is not set — gem built but not published (see RELEASE.md)"
-          else
-            gem push kilden-*.gem
-          fi
+        run: gem push kilden-*.gem
       - name: github release
         env:
           GH_TOKEN: ${{ github.token }}
