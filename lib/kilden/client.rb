@@ -1,5 +1,4 @@
 require "json"
-require "logger"
 require "time"
 
 module Kilden
@@ -40,7 +39,7 @@ module Kilden
       end
 
       @debug = debug ? true : false
-      @logger = logger || Logger.new($stderr, progname: "kilden", level: @debug ? Logger::DEBUG : Logger::WARN)
+      @logger = logger || Log.new(@debug ? :debug : :warn)
       @enabled = enabled ? true : false
       @flush_interval = flush_interval
       return unless @enabled

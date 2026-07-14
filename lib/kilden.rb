@@ -11,6 +11,7 @@ module Kilden
 end
 
 require "kilden/version"
+require "kilden/log"
 require "kilden/uuid"
 require "kilden/canonical_json"
 require "kilden/identity_signer"
