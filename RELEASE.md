@@ -1,28 +1,24 @@
 # Releasing
 
-Releases are cut from a git tag; CI publishes to RubyGems.
+Releases are cut from `v*` tags; `release.yml` runs the suite, builds the
+gem, publishes to RubyGems via **OIDC trusted publishing** (no API key
+secret), and creates the GitHub prerelease with the `.gem` attached.
 
-1. Update `lib/kilden/version.rb` and `CHANGELOG.md`.
-2. `bundle exec rake all && bundle exec rubocop && gem build kilden.gemspec`
-3. Commit, tag and push:
+## One-time setup
 
-   ```sh
-   git tag v0.1.0-alpha.1
-   git push origin main v0.1.0-alpha.1
-   ```
+Register the trusted publisher on rubygems.org (works before the first push,
+as a *pending* publisher): profile → OIDC → Pending trusted publishers →
 
-The `release` workflow builds the gem and runs `gem push`, authenticating
-with the `RUBYGEMS_API_KEY` repository secret.
+- RubyGem name: `kilden`
+- Repository: `freshworkstudio/kilden-sdk-ruby`
+- Workflow filename: `release.yml` · Environment: (leave empty)
 
-## Until the secret exists
+## Cutting a release
 
-`RUBYGEMS_API_KEY` is not configured yet, so tags build but do not publish.
-To publish manually:
+1. Bump `Kilden::VERSION` in `lib/kilden/version.rb`
+   (gem prerelease format: `0.1.0.alpha.3` ↔ git tag `v0.1.0-alpha.3`).
+2. Update `CHANGELOG.md`.
+3. `git tag v0.1.0-alpha.3 && git push origin v0.1.0-alpha.3`.
 
-```sh
-gem build kilden.gemspec
-GEM_HOST_API_KEY=<rubygems-api-key> gem push kilden-0.1.0.alpha.1.gem
-```
-
-The RubyGems version for a `vX.Y.Z-alpha.N` tag is `X.Y.Z.alpha.N` (RubyGems
-prerelease versions use dots, git tags use the SemVer dash).
+Manual fallback (needs an API key): `gem build kilden.gemspec && gem push
+kilden-*.gem`.
