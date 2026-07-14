@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kilden
   # TTL + LRU cache of /decide responses, keyed by distinct_id (spec §8.2:
   # TTL 30s, at most 1000 ids). Ruby's insertion-ordered Hash doubles as the

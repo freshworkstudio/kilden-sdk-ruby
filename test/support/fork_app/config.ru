@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Minimal Rack app for the fork-safety integration test. Booted with
 # `puma -w 2 --preload`: the client is built (and its queue seeded) in the
 # master process BEFORE the workers fork, which is exactly the scenario
@@ -15,9 +17,11 @@ client = Kilden::Client.new(
 # Seed events into the master's queue without waking the worker thread —
 # the frozen inherited state a preforked child must discard, not resend.
 queue = client.instance_variable_get(:@queue)
-3.times { |i| queue.push({ "uuid" => Kilden::UUID.v7, "event" => "inherited",
-                           "distinct_id" => "master", "properties" => { "i" => i },
-                           "timestamp" => Kilden::Client.format_time(Time.now) }) }
+3.times do |i|
+  queue.push({ "uuid" => Kilden::UUID.v7, "event" => "inherited",
+               "distinct_id" => "master", "properties" => { "i" => i },
+               "timestamp" => Kilden::Client.format_time(Time.now) })
+end
 
 run lambda { |env|
   if env["PATH_INFO"] == "/health"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 require "time"
 
@@ -29,7 +31,8 @@ module Kilden
                    max_queue_size: 10_000, timeout: 3, transport: nil, debug: false,
                    enabled: true, logger: nil)
       unless write_key.is_a?(String) && !write_key.empty?
-        raise ConfigurationError, "a write key is required — find your project's secret key (sk_...) in the Kilden panel"
+        raise ConfigurationError,
+              "a write key is required — find your project's secret key (sk_...) in the Kilden panel"
       end
       if write_key.start_with?("wk_")
         raise ConfigurationError,
@@ -94,9 +97,8 @@ module Kilden
       guard do
         next unless @enabled && open_for_events?
 
-        unless valid_id?(distinct_id, "alias distinct_id")
-          next
-        end
+        next unless valid_id?(distinct_id, "alias distinct_id")
+
         payload = build_event(previous_id, "$alias", { "$alias" => distinct_id }, {}, reserved: true)
         enqueue(payload) if payload
         nil
@@ -265,7 +267,7 @@ module Kilden
     def enqueue(payload)
       check_fork
       unless @queue.push(payload)
-        @logger.warn("kilden: queue full (#{payload["event"]} dropped)")
+        @logger.warn("kilden: queue full (#{payload['event']} dropped)")
         return
       end
       ensure_worker
@@ -287,7 +289,8 @@ module Kilden
         @closed = false
         @shutdown_deadline = nil
         @pid = Process.pid
-        @logger.info("kilden: fork detected (pid #{@pid}); discarded #{discarded} inherited events and restarted the worker")
+        @logger.info("kilden: fork detected (pid #{@pid}); " \
+                     "discarded #{discarded} inherited events and restarted the worker")
       end
     end
 
@@ -301,7 +304,7 @@ module Kilden
           loop do
             batch = @queue.wait_batch(@flush_interval, max: BATCH_LIMIT)
             @sender.send_batch(batch, deadline: @shutdown_deadline) unless batch.empty?
-            break if @queue.closed? && @queue.size.zero?
+            break if @queue.closed? && @queue.empty?
           end
         end
         @worker.name = "kilden-worker"
@@ -343,7 +346,7 @@ module Kilden
   class Decide
     def initialize(write_key:, host:, timeout:, transport:, logger:)
       @write_key = write_key
-      @url = "#{host.chomp("/")}/decide"
+      @url = "#{host.chomp('/')}/decide"
       @transport = transport || Transport::NetHttp.new(timeout: timeout)
       @logger = logger
     end
@@ -356,7 +359,8 @@ module Kilden
                                  "Content-Type" => "application/json",
                                  "User-Agent" => "kilden-ruby/#{VERSION}")
       unless response.status == 200
-        @logger.warn("kilden: /decide failed (#{response.network_error? ? response.error&.class : "HTTP #{response.status}"}); using defaults")
+        reason = response.network_error? ? response.error&.class : "HTTP #{response.status}"
+        @logger.warn("kilden: /decide failed (#{reason}); using defaults")
         return nil
       end
 

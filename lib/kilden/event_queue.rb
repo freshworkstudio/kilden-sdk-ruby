@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kilden
   # Bounded in-memory queue (spec contract 7): at capacity the NEW event is
   # dropped, never the old ones, and the drop is counted. Wakes the worker

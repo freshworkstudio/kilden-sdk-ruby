@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Kilden server-side SDK. Public surface: Kilden::Client and
 # Kilden::IdentitySigner — everything else is internal.
 #
@@ -7,7 +9,8 @@
 module Kilden
   # Raised only at construction time (spec contract 2): bad write key,
   # bad signer configuration. Nothing raises after construction.
-  ConfigurationError = Class.new(ArgumentError)
+  class ConfigurationError < ArgumentError
+  end
 end
 
 require "kilden/version"

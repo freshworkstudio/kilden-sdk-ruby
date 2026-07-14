@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift File.expand_path("../lib", __dir__)
 
 require "kilden"
@@ -60,7 +62,7 @@ end
 
 # Silent logger for integration tests.
 class NullLog
-  %i[debug info warn error].each { |level| define_method(level) { |_message| } }
+  %i[debug info warn error].each { |level| define_method(level) { |_message| nil } }
 end
 
 module ClientHelpers
@@ -72,7 +74,7 @@ module ClientHelpers
       logger: (@log = CapturedLogger.new),
       flush_at: 1000, flush_interval: 3600
     }
-    Kilden::Client.new("sk_test_secret", **defaults.merge(overrides))
+    Kilden::Client.new("sk_test_secret", **defaults, **overrides)
   end
 
   def sent_events

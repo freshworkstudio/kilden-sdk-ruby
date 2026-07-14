@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rake/testtask"
 
 # Unit tests: no network, no mock server.

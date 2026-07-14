@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 
 module Kilden
@@ -19,9 +21,9 @@ module Kilden
           raw = value.key?(key) ? value[key] : value[key.to_sym]
           "#{string(key)}:#{generate(raw)}"
         end
-        "{#{pairs.join(",")}}"
+        "{#{pairs.join(',')}}"
       when Array
-        "[#{value.map { |v| generate(v) }.join(",")}]"
+        "[#{value.map { |v| generate(v) }.join(',')}]"
       when String
         string(value)
       when Integer, Float, TrueClass, FalseClass

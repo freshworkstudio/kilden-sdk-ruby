@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "test_helper"
 
 class FlagCacheTest < Minitest::Test
@@ -7,8 +9,10 @@ class FlagCacheTest < Minitest::Test
     cache.set("u1", { "f" => true })
 
     now[0] = 29.9
+
     assert_equal({ "f" => true }, cache.get("u1"))
     now[0] = 30.0
+
     assert_nil cache.get("u1")
   end
 

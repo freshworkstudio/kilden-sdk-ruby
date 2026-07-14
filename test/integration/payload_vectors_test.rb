@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "integration_helper"
 
 # The spec §9 payload-vector runner: replay every call against the live mock
@@ -8,7 +10,7 @@ class PayloadVectorsTest < Minitest::Test
   DOC = JSON.parse(File.read(File.join(SPEC_DIR, "vectors", "payload.json")))
 
   DOC["vectors"].each do |vector|
-    define_method("test_#{vector["name"]}") do
+    define_method("test_#{vector['name']}") do
       MockServer.reset
       client = live_client
       replay(client, vector["call"])
@@ -38,7 +40,7 @@ class PayloadVectorsTest < Minitest::Test
     when "alias"
       client.alias(args["previous_id"], args["distinct_id"])
     else
-      flunk "unknown vector method #{call["method"]}"
+      flunk "unknown vector method #{call['method']}"
     end
   end
 

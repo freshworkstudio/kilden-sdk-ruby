@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "integration_helper"
 
 # Contract 9 under a REAL preforking server: puma -w 2 --preload, client
@@ -15,6 +17,7 @@ class ForkSafetyTest < Minitest::Test
       wait_for_puma
       REQUESTS.times do |i|
         response = Net::HTTP.get_response(URI("http://127.0.0.1:#{PUMA_PORT}/?i=#{i}"))
+
         assert_equal "200", response.code
       end
 
@@ -26,6 +29,7 @@ class ForkSafetyTest < Minitest::Test
       assert_equal REQUESTS, hits.map { |e| e["uuid"] }.uniq.size, "no duplicate deliveries"
 
       pids = hits.map { |e| e["properties"]["pid"] }.uniq
+
       assert_operator pids.size, :>=, 2, "traffic must come from at least two preforked workers"
 
       # The master never flushed (its worker thread never started) and the

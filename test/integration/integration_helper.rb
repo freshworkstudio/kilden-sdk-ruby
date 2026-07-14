@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "../test_helper"
 require "net/http"
 
@@ -64,6 +66,6 @@ module IntegrationHelpers
 
   def live_client(**overrides)
     defaults = { host: MockServer::HOST, flush_at: 1000, flush_interval: 3600, logger: quiet_logger }
-    Kilden::Client.new("sk_test_secret", **defaults.merge(overrides))
+    Kilden::Client.new("sk_test_secret", **defaults, **overrides)
   end
 end

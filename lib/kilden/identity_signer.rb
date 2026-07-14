@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "openssl"
 
 module Kilden
@@ -19,8 +21,14 @@ module Kilden
     MAX_TTL = 604_800 # 7 days; identity tokens are short-lived by design
 
     def initialize(identity_secret, kid:)
-      raise ConfigurationError, "identity secret is required" if !identity_secret.is_a?(String) || identity_secret.empty?
-      raise ConfigurationError, "kid is required (the platform looks the secret up by kid)" if !kid.is_a?(String) || kid.empty?
+      if !identity_secret.is_a?(String) || identity_secret.empty?
+        raise ConfigurationError,
+              "identity secret is required"
+      end
+      if !kid.is_a?(String) || kid.empty?
+        raise ConfigurationError,
+              "kid is required (the platform looks the secret up by kid)"
+      end
 
       @secret = identity_secret
       @kid = kid

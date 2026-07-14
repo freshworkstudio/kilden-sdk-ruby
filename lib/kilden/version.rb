@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kilden
-  VERSION = "0.1.0.alpha.1".freeze
+  VERSION = "0.1.0.alpha.1"
 end

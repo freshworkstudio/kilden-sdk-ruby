@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "test_helper"
 
 class UUIDTest < Minitest::Test
@@ -10,11 +12,13 @@ class UUIDTest < Minitest::Test
   def test_v7_embeds_the_timestamp
     ms = 1_752_500_000_000
     uuid = Kilden::UUID.v7(ms)
+
     assert_equal ms.to_s(16).rjust(12, "0"), uuid.delete("-")[0, 12]
   end
 
   def test_v7_unique
     uuids = Array.new(1000) { Kilden::UUID.v7 }
+
     assert_equal 1000, uuids.uniq.size
   end
 

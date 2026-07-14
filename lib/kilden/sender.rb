@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "json"
 require "zlib"
 
@@ -14,7 +16,7 @@ module Kilden
 
     def initialize(write_key:, host:, transport:, logger:, sleeper: nil, rng: Random.new)
       @write_key = write_key
-      @capture_url = "#{host.chomp("/")}/capture"
+      @capture_url = "#{host.chomp('/')}/capture"
       @transport = transport
       @logger = logger
       @sleeper = sleeper || ->(seconds) { sleep(seconds) }
@@ -42,7 +44,8 @@ module Kilden
         return :ok if success?(response)
 
         unless retryable?(response)
-          drop(events, "kilden: dropped #{events.size} events (HTTP #{response.status}: #{response.body.to_s.strip[0, 120]})")
+          drop(events,
+               "kilden: dropped #{events.size} events (HTTP #{response.status}: #{response.body.to_s.strip[0, 120]})")
           return :dropped
         end
 

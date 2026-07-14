@@ -1,0 +1,37 @@
+AllCops:
+  TargetRubyVersion: 3.0
+  NewCops: enable
+  SuggestExtensions: false
+
+plugins:
+  - rubocop-minitest
+  - rubocop-rake
+
+Layout/LineLength:
+  Max: 120
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Metrics/AbcSize:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Metrics/BlockLength:
+  Exclude: [test/**/*, kilden.gemspec]
+Metrics/ParameterLists:
+  Enabled: false
+
+Minitest/MultipleAssertions:
+  Enabled: false
+Minitest/AssertEmptyLiteral:
+  Enabled: false

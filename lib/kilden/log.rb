@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kilden
   # Minimal leveled logger writing to $stderr. The stdlib logger is leaving
   # the default gems (Ruby 4), and this SDK ships zero dependencies — so the
