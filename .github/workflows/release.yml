@@ -12,11 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: freshworkstudio/kilden-sdk-spec
+          ref: main
+          path: kilden-sdk-spec
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4"
           bundler-cache: true
       - run: bundle exec rake test
+        env:
+          KILDEN_SPEC_DIR: ${{ github.workspace }}/kilden-sdk-spec
       - run: gem build kilden.gemspec
       - name: push to rubygems
         env:
