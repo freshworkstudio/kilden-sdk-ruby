@@ -22,6 +22,23 @@ jobs:
         with:
           ruby-version: "3.4"
           bundler-cache: true
+      - name: tag matches Kilden::VERSION
+        # SPEC §4.1 reports this in the User-Agent (`kilden-ruby/<version>`)
+        # and nothing compared it to the tag: kilden-sdk-php shipped two
+        # releases and kilden-sdk-go one, all declaring a stale version.
+        # Compare through Gem::Version, not as strings — the tag is semver and
+        # the gem version is dotted (v0.1.0-alpha.3 ↔ 0.1.0.alpha.3), so a
+        # literal comparison would reject every valid prerelease.
+        run: |
+          ruby -e '
+            require "./lib/kilden/version"
+            tag = ENV.fetch("GITHUB_REF_NAME").delete_prefix("v").tr("-", ".")
+            declared = Kilden::VERSION
+            if Gem::Version.new(tag) != Gem::Version.new(declared)
+              abort "::error::tag #{ENV["GITHUB_REF_NAME"]} ships Kilden::VERSION #{declared.inspect} — bump lib/kilden/version.rb"
+            end
+            puts "version #{declared.inspect} matches tag #{ENV["GITHUB_REF_NAME"]}"
+          '
       - run: bundle exec rake test
         env:
           KILDEN_SPEC_DIR: ${{ github.workspace }}/kilden-sdk-spec
@@ -35,4 +52,15 @@ jobs:
       - name: github release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" kilden-*.gem --generate-notes --prerelease
+        # --prerelease used to be unconditional, which is right for the alpha
+        # line and wrong the moment a stable ships: v0.1.0 was flagged a
+        # prerelease, so GitHub reported no latest release at all (the
+        # releases/latest API 404s, and the repo shows no "Latest" badge).
+        # Decide from the tag instead.
+        run: |
+          case "$GITHUB_REF_NAME" in
+            *-alpha*|*-beta*|*-rc*) flag=--prerelease ;;
+            *) flag=--latest ;;
+          esac
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 ||
+            gh release create "$GITHUB_REF_NAME" kilden-*.gem --generate-notes "$flag"
