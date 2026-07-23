@@ -1,3 +1,7 @@
+# Every job runs in an ubuntu container: setup-php/python/ruby only ship
+# prebuilt toolchains for GitHub's ubuntu images and fail outright on the lab
+# runners, which are Debian 13. buildpack-deps carries the git + build tools
+# those actions expect on top of it.
 name: ci
 
 on:
@@ -5,9 +9,17 @@ on:
     branches: [main]
   pull_request:
 
+# The lab runners run these jobs in a bare ubuntu container, which sets no
+# locale: Ruby then defaults to US-ASCII and any UTF-8 byte in a JSON payload
+# blows up as Encoding::InvalidByteSequenceError. GitHub's hosted image ships
+# LANG=C.UTF-8; set it ourselves.
+env:
+  LANG: C.UTF-8
+
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    runs-on: kilden-runners
+    container: buildpack-deps:jammy
     strategy:
       fail-fast: false
       matrix:
@@ -30,7 +42,8 @@ jobs:
           KILDEN_SPEC_DIR: ${{ github.workspace }}/kilden-sdk-spec
 
   lint:
-    runs-on: ubuntu-latest
+    runs-on: kilden-runners
+    container: buildpack-deps:jammy
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
@@ -42,7 +55,8 @@ jobs:
   # Spec conformance: boots kilden-sdk-spec's mock capture server and runs
   # the vector runners plus retry/gzip/flags/fork-safety behavior against it.
   integration:
-    runs-on: ubuntu-latest
+    runs-on: kilden-runners
+    container: buildpack-deps:jammy
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
