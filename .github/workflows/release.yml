@@ -12,6 +12,13 @@ permissions:
   contents: write
   id-token: write
 
+# The lab runners run these jobs in a bare ubuntu container, which sets no
+# locale: Ruby then defaults to US-ASCII and any UTF-8 byte in a JSON payload
+# blows up as Encoding::InvalidByteSequenceError. GitHub's hosted image ships
+# LANG=C.UTF-8; set it ourselves.
+env:
+  LANG: C.UTF-8
+
 jobs:
   publish:
     runs-on: kilden-runners
